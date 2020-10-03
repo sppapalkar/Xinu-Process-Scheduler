@@ -1,0 +1,54 @@
+1. What are the advantages and disadvantages of each of the two scheduling policies? Also, give the advantages and disadvantages of the round-robin scheduling policy 
+originally implemented in Xinu.
+Answer:
+- Exponential Distribution Scheduler
+Advantages:
+i. Since the exponential distribution uses a random number generator to decide which process to execute next it is successful in avoiding process starvation which is a
+common problem in the default Xinu scheduler.
+ii. It is a light-weight scheduler since the logic behind choosing the next process for execution only needs a random number generator and does not require any additional
+global state.
+iii. Randomization allows us to avoid corner case behaviour that may arise in certain types of scheduler. It also makes it difficult to game the scheduler.
+iv. A scheduler based on a random number generator ensures that all processes have equal priority for execution.
+
+Disadvantages:
+i. The random number generator pays little regard to the process priority since the process chosen depends entirely on the random number. Thus a process with 
+significantly higher priority will have the same probability for execution as a process with less priority.
+ii. While the random number generator produces a good spread of values when run for a long amount of time, it may not necessarily generate a good spread of values when 
+executing for a short amount of time. Thus few processes my still experience starvation when run for a small duration of time.
+
+- Linux-like Scheduler:
+Advantages:
+i. Avoids process starvation by considering both the process priorities as well as the CPU utilization. 
+ii. Higher priority processes have a higher chance of being chosen for execution, unlike the exponential distribution scheduler. This is because the higher priority 
+processes are likely to have higher goodness value. 
+iii. Processes that perform I/O get a fair chance to start execution again.
+iv. The goodness value depends both on the priority as well as the CPU utilization. This ensures that responsive processes get their fair share of CPU time even if their
+priority is low.
+v. It is difficult to game the scheduler.
+
+Disadvantages:
+i. We need to maintain the goodness and counter value for every process thus providing an additional overhead of maintaining an additional global state for every process.
+ii. The algorithm for choosing the next process is a lot time consuming compared to the priority-based default xinu scheduler or the exponential distribution scheduler.
+
+
+- Priority based round robin scheduler:
+Advantages:
+i.  No global state is required to be maintained for each process.
+ii. Fastest of amongst the three schedulers as the ready queue is maintained using a priority queue and therefore the highest priority process can be asily chosen.
+
+Disadvantages:
+i. Low priority do not get their share of CPU time until all higher priority processes end. Thus lower priority process experience process starvation.
+ii. Lower priority processes will always experience longer wait times.
+
+
+2. Describe the way each of the schedulers affects the NULL process:
+- Exponential Distribution Scheduler
+In exponential distribution scheduler the null process is executed only when there are no other processes in the ready queue.
+
+- Linux-like Scheduler
+In linux like scheduler a null process can be chosen in the case when all other process in the ready queue have goodness value of 0 or when there are no other process
+in the ready queue. If a null process is chosen we start a new epoch again try to find a new process.
+
+- Priority-based round-robin scheduler
+Since the null process has a priority value of 0 it is always the last process in the priority queue. Thus it will only be chosen for execution if there are no other
+process in the ready queue.
